@@ -4,7 +4,10 @@ import styles from "./page.module.css";
 
 export default function Page(): JSX.Element {
   return (
-    <main className={styles.main}>
+    <main
+      className="d-flex  justify-content-center  align-items-center "
+      style={{ height: "100vh", width: "100vw" }}
+    >
       <SupportAgentForm />
     </main>
   );
