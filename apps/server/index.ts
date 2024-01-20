@@ -1,9 +1,10 @@
 import express, { Request, Response } from "express";
 import mongoose, { Schema, Document, SortOrder } from "mongoose";
 import bodyParser from "body-parser";
-require("dotenv").config();
+import cros from "cors";
 
 const app = express();
+app.use(cros());
 const port = 5069; // Choose your desired port
 const mongodbUrl = `mongodb+srv://testUser:123@support-ticket-system.zafbnh0.mongodb.net/?retryWrites=true&w=majority`;
 
