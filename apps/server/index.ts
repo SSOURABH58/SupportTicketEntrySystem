@@ -84,7 +84,7 @@ app.post("/api/support-tickets", async (req: Request, res: Response) => {
   try {
     const { topic, description, severity, type } = req.body;
 
-    // Find the first support agent that is active and has the least number of assigned tickets
+    // to Find the first support agent that is active and has the least number of assigned tickets
     const supportAgent = await SupportAgentModel.aggregate([
       { $match: { active: true } },
       { $addFields: { assignedTicketsCount: { $size: "$assignedTickets" } } },
@@ -99,7 +99,12 @@ app.post("/api/support-tickets", async (req: Request, res: Response) => {
       type,
       assignedTo: supportAgent[0]._id || null,
     });
+
     await ticket.save();
+    await SupportAgentModel.updateOne(
+      { _id: supportAgent[0]._id },
+      { $push: { assignedTickets: ticket._id } }
+    );
 
     res.status(201).json(ticket);
   } catch (error) {
@@ -107,7 +112,6 @@ app.post("/api/support-tickets", async (req: Request, res: Response) => {
   }
 });
 
-// a get tickitas qiray to get all tickets and add filter for Status, AssignedTo, Severity, Type and sort by resolvedOn, dateCreated
 app.get(
   "/api/support-tickets",
   async (
@@ -156,7 +160,6 @@ app.get(
   }
 );
 
-// a get api saying hellow
 app.get("/api/hello", async (req: Request, res: Response) => {
   try {
     res.status(200).json({ message: "Hello" });
