@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, SortOrder } from "mongoose";
 import bodyParser from "body-parser";
 
 const app = express();
@@ -8,13 +8,8 @@ const mongodbUrl = `mongodb+srv://testUser:123@support-ticket-system.zafbnh0.mon
 
 app.use(bodyParser.json());
 
-// Connect to MongoDB (replace 'your-mongodb-uri' with your actual MongoDB URI)
-mongoose.connect(mongodbUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(mongodbUrl);
 
-// Define Support Agent and Support Ticket models here
 interface SupportAgent extends Document {
   name: string;
   email: string;
@@ -22,6 +17,7 @@ interface SupportAgent extends Document {
   description: string;
   active: boolean;
   dateCreated: Date;
+  assignedTickets: mongoose.Types.ObjectId[];
 }
 
 const supportAgentSchema = new Schema<SupportAgent>({
@@ -31,6 +27,7 @@ const supportAgentSchema = new Schema<SupportAgent>({
   description: { type: String, required: false },
   active: { type: Boolean, default: true },
   dateCreated: { type: Date, default: Date.now },
+  assignedTickets: [{ type: Schema.Types.ObjectId, ref: "SupportTicket" }],
 });
 
 const SupportAgentModel = mongoose.model<SupportAgent>(
@@ -58,7 +55,6 @@ const supportTicketSchema = new Schema<SupportTicket>({
   assignedTo: {
     type: Schema.Types.ObjectId,
     ref: "SupportAgent",
-    required: true,
   },
   status: {
     type: String,
@@ -73,7 +69,6 @@ const SupportTicketModel = mongoose.model<SupportTicket>(
   supportTicketSchema
 );
 
-// Define API endpoints for creating support agents and tickets
 app.post("/api/support-agents", async (req: Request, res: Response) => {
   try {
     const { name, email, phone, description } = req.body;
@@ -88,55 +83,85 @@ app.post("/api/support-agents", async (req: Request, res: Response) => {
 app.post("/api/support-tickets", async (req: Request, res: Response) => {
   try {
     const { topic, description, severity, type } = req.body;
-    const activeAgents = await SupportAgentModel.find({ active: true });
-    if (activeAgents.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No active support agents available" });
-    }
-    const nextAgentIndex = activeAgents.findIndex((agent) =>
-      agent._id.equals(req.body.assignedTo)
-    );
-    const assignedTo = activeAgents[nextAgentIndex % activeAgents.length];
+
+    // Find the first support agent that is active and has the least number of assigned tickets
+    const supportAgent = await SupportAgentModel.aggregate([
+      { $match: { active: true } },
+      { $addFields: { assignedTicketsCount: { $size: "$assignedTickets" } } },
+      { $sort: { assignedTicketsCount: 1 } },
+      { $limit: 1 },
+    ]);
+
     const ticket = new SupportTicketModel({
       topic,
       description,
       severity,
       type,
-      assignedTo,
+      assignedTo: supportAgent[0]._id || null,
     });
     await ticket.save();
+
     res.status(201).json(ticket);
   } catch (error) {
     res.status(500).json({ error: "Failed to create support ticket" });
   }
 });
 
-//create an API for ticket assignment to support agent in a round-robin fashion
-app.post("/api/assign-ticket", async (req: Request, res: Response) => {
+// a get tickitas qiray to get all tickets and add filter for Status, AssignedTo, Severity, Type and sort by resolvedOn, dateCreated
+app.get(
+  "/api/support-tickets",
+  async (
+    req: Request<
+      {},
+      {},
+      {},
+      {
+        status?: string;
+        assignedTo?: string;
+        severity?: string;
+        type?: string;
+        sortBy?: string;
+        order?: SortOrder;
+      }
+    >,
+    res: Response
+  ) => {
+    try {
+      const { status, assignedTo, severity, type, sortBy, order } = req.query;
+      const query: any = {};
+
+      if (status) {
+        query.status = status;
+      }
+
+      if (assignedTo) {
+        query.assignedTo = assignedTo;
+      }
+
+      if (severity) {
+        query.severity = severity;
+      }
+
+      if (type) {
+        query.type = type;
+      }
+      const tickets = await SupportTicketModel.find(query).sort({
+        [sortBy ?? "dateCreated"]: order ?? 1,
+      });
+
+      res.status(200).json(tickets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get support tickets" });
+    }
+  }
+);
+
+// a get api saying hellow
+app.get("/api/hello", async (req: Request, res: Response) => {
   try {
-    const { ticketId } = req.body;
-    const ticket = await SupportTicketModel.findById(ticketId);
-    if (!ticket) {
-      return res.status(404).json({ error: "Ticket not found" });
-    }
-    const activeAgents = await SupportAgentModel.find({ active: true });
-    if (activeAgents.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No active support agents available" });
-    }
-    const currentAgentIndex = activeAgents.findIndex((agent) =>
-      agent._id.equals(ticket.assignedTo)
-    );
-    const nextAgentIndex =
-      currentAgentIndex === activeAgents.length - 1 ? 0 : currentAgentIndex + 1;
-    const nextAgent = activeAgents[nextAgentIndex];
-    ticket.assignedTo = nextAgent;
-    await ticket.save();
-    res.status(200).json(ticket);
+    res.status(200).json({ message: "Hello" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to assign ticket" });
+    res.status(500).json({ error: "Failed to get support tickets" });
   }
 });
 
