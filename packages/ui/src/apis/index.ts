@@ -3,9 +3,6 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "http://localhost:5069/",
 });
-console.log("process.env.PUBLIC_BASE_URL", process.env.PUBLIC_BASE_URL);
-
-export default api;
 
 export const createAgent = async (agent) => {
   try {
@@ -15,7 +12,7 @@ export const createAgent = async (agent) => {
   }
 };
 
-export const creatTicket = async (ticket) => {
+export const createTicket = async (ticket) => {
   try {
     await api.post("/api/support-tickets", ticket);
   } catch (error) {
@@ -32,3 +29,5 @@ export const getTickets = async () => {
     console.log(error);
   }
 };
+
+export default api;
