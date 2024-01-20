@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import mongoose, { Schema, Document, SortOrder } from "mongoose";
 import bodyParser from "body-parser";
+require("dotenv").config();
 
 const app = express();
 const port = 5069; // Choose your desired port

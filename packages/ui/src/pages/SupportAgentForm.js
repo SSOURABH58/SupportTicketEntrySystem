@@ -1,33 +1,29 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import api, { createAgent } from './../apis';
 
 const SupportAgentForm = () => {
-    // Define the validation schema using Yup
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Name is required'),
         email: Yup.string().email('Invalid email').required('Email is required'),
         phone: Yup.string().required('Phone is required'),
         description: Yup.string().required('Description is required'),
     });
-
-    // Define the initial form values
     const initialValues = {
         name: '',
         email: '',
         phone: '',
         description: '',
     };
-
-    // Handle form submission
     const handleSubmit = (values) => {
-        // Perform the necessary actions with the form values
+        createAgent(values);
         console.log(values);
     };
 
     return (
-        <div className='container'>
-            <div className='col'>
+        <div className='card shadow border-0 '>
+            <div className='card-body p-5 '>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
@@ -72,7 +68,6 @@ const SupportAgentForm = () => {
                                 </div>
                             </div>
                         </div>
-                        {/* <div className='row'> */}
                         <div className='col mb-3'>
                             <div className='form-group'>
                                 <label htmlFor='phone'>Phone</label>
@@ -105,7 +100,6 @@ const SupportAgentForm = () => {
                                 />
                             </div>
                         </div>
-                        {/* </div> */}
                         <button type='submit' className='btn btn-primary'>
                             Submit
                         </button>
