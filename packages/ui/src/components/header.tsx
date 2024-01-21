@@ -1,41 +1,35 @@
+"use client";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
+  const router = usePathname();
+  const links = [
+    { path: "/", label: "Home" },
+    { path: "/agent", label: "Agent" },
+    { path: "/ticket", label: "Ticket" },
+  ];
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
-        <a className="navbar-brand" href="#">
-          Title
+        <a className="navbar-brand" href="/">
+          <h4 className="text-black-60 fw-semibold ">
+            Support Ticket Entry System
+          </h4>
         </a>
-        {/* <button
-          className="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button> */}
-        {/* <div className="collapse navbar-collapse" id="navbarNav"> */}
         <div className="">
           <ul className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <a className="nav-link" href="/">
-                Home
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/agent">
-                Agent
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="ticket">
-                Ticket
-              </a>
-            </li>
+            {links.map((link) => (
+              <li className="nav-item" key={link.path}>
+                <a
+                  className={`nav-link ${router === link.path ? "active fw-semibold " : ""}`}
+                  href={link.path}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

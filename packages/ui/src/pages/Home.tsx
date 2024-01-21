@@ -62,7 +62,7 @@ const Home = () => {
 
   return (
     <div className="container">
-      <h1 className="mt-4">Support Tickets</h1>
+      <h1 className="mt-4 ">Support Tickets</h1>
 
       <div className="row mt-4">
         <div className="col-md-3">
@@ -121,7 +121,7 @@ const Home = () => {
         </div>
       </div>
 
-      <table className="table mt-4">
+      <table className="table mt-4 ">
         <thead>
           <tr>
             <th>

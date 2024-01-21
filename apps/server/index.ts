@@ -50,7 +50,7 @@ interface SupportTicket extends Document {
 
 const supportTicketSchema = new Schema<SupportTicket>({
   topic: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: String },
   dateCreated: { type: Date, default: Date.now },
   severity: { type: String, required: true },
   type: { type: String, required: true },

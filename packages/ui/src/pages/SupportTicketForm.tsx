@@ -7,7 +7,7 @@ const SupportTicketForm = () => {
   const validationSchema = Yup.object().shape({
     topic: Yup.string().required("Name is required"),
     type: Yup.string().required("type is required"),
-    description: Yup.string().required("Description is required"),
+    description: Yup.string(),
     severity: Yup.string().required("Severity is required"),
   });
 
