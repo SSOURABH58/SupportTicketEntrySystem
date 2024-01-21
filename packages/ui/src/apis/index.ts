@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5069/",
+  // baseURL: "http://localhost:5069/",
+  baseURL: "https://supportticket-ly5l.onrender.com/",
 });
 
 export const createAgent = async (agent) => {
