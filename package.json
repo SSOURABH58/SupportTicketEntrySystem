@@ -6,7 +6,9 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "web": "cd apps/web && yarn dev"
+    "web": "cd apps/web && yarn dev",
+    "api": "cd apps/server && yarn dev",
+    "server": "cd apps/server && yarn start"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",

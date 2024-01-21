@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    // ... other options
+    "rootDir": "src", // Location of TypeScript files
+    "outDir": "dist", // Location of compiled JavaScript files
+
+    "sourceMap": true, // Generate sourcemaps
+  },
+}
