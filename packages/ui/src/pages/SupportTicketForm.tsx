@@ -18,8 +18,10 @@ const SupportTicketForm = () => {
     description: "",
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values, { resetForm }) => {
     console.log("values", values);
+    resetForm();
+
     createTicket(values);
   };
 

@@ -16,8 +16,9 @@ const SupportAgentForm = () => {
     phone: "",
     description: "",
   };
-  const handleSubmit = (values) => {
+  const handleSubmit = (values, { resetForm }) => {
     createAgent(values);
+    resetForm();
     console.log(values);
   };
 
