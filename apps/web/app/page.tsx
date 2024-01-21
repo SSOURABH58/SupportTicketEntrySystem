@@ -1,7 +1,9 @@
+"use client";
 import React from "react";
+import Home from "@repo/ui/src/pages/Home";
 
 function page() {
-  return <div>page</div>;
+  return <Home />;
 }
 
 export default page;

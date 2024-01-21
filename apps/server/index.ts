@@ -128,12 +128,17 @@ app.get(
         type?: string;
         sortBy?: string;
         order?: SortOrder;
+        page?: number;
+        limit?: number;
       }
     >,
     res: Response
   ) => {
     try {
-      const { status, assignedTo, severity, type, sortBy, order } = req.query;
+      console.log("Get tickets");
+
+      const { status, assignedTo, severity, type, sortBy, order, page, limit } =
+        req.query;
       const query: any = {};
 
       if (status) {
@@ -151,11 +156,26 @@ app.get(
       if (type) {
         query.type = type;
       }
-      const tickets = await SupportTicketModel.find(query).sort({
-        [sortBy ?? "dateCreated"]: order ?? 1,
-      });
 
-      res.status(200).json(tickets);
+      const pageNumber = page || 1;
+      const pageSize = limit || 10;
+      const skip = (pageNumber - 1) * pageSize;
+
+      const tickets = await SupportTicketModel.find(query)
+        .sort({ [sortBy ?? "dateCreated"]: order ?? 1 })
+        .skip(skip)
+        .limit(pageSize);
+
+      const totalCount = await SupportTicketModel.countDocuments(query);
+
+      const totalPages = Math.ceil(totalCount / pageSize);
+
+      res.status(200).json({
+        tickets,
+        page: pageNumber,
+        totalPages,
+        totalCount,
+      });
     } catch (error) {
       res.status(500).json({ error: "Failed to get support tickets" });
     }

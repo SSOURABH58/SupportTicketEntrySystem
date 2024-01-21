@@ -22,18 +22,18 @@ const Header = () => {
         <div className="">
           <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Link 1
+              <a className="nav-link" href="/">
+                Home
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Link 2
+              <a className="nav-link" href="/agent">
+                Agent
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Link 3
+              <a className="nav-link" href="ticket">
+                Ticket
               </a>
             </li>
           </ul>

@@ -20,9 +20,13 @@ export const createTicket = async (ticket) => {
   }
 };
 
-export const getTickets = async () => {
+export const getTickets = async (filters) => {
   try {
-    const response = await api.get("/api/support-tickets");
+    const response = await api.get("/api/support-tickets", {
+      params: {
+        ...filters,
+      },
+    });
     console.log("response", response);
     return response.data;
   } catch (error) {
