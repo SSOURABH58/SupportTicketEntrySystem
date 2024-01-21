@@ -190,6 +190,34 @@ app.get("/api/hello", async (req: Request, res: Response) => {
   }
 });
 
+// end point to resolve a ticket and remove it form the assigned tickets of the agent
+app.put(
+  "/api/support-tickets/:id/resolve",
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const ticket = await SupportTicketModel.findById(id);
+      if (!ticket) {
+        res.status(404).json({ error: "Ticket not found" });
+        return;
+      }
+
+      await SupportTicketModel.updateOne(
+        { _id: id },
+        { status: "Resolved", resolvedOn: Date.now() }
+      );
+      await SupportAgentModel.updateOne(
+        { _id: ticket.assignedTo },
+        { $pull: { assignedTickets: id } }
+      );
+
+      res.status(200).json({ message: "Ticket resolved" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to resolve ticket" });
+    }
+  }
+);
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

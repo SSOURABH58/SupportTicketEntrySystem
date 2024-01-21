@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { getTickets } from "./../apis";
+import { getTickets, resolveTicket } from "./../apis";
 
 const Home = () => {
   const [tickets, setTickets] = useState<any[]>([]);
@@ -21,24 +21,24 @@ const Home = () => {
     totalCount: 0,
   });
 
+  const fetchTickets = async () => {
+    const { tickets, totalPages, totalCount } = await getTickets({
+      ...filters,
+      sortBy: sort.sortBy,
+      order: sort.order,
+      page: pagination.page,
+      limit: pagination.limit,
+    });
+
+    setTickets(tickets);
+    setPagination((prevState) => ({
+      ...prevState,
+      totalPages,
+      totalCount,
+    }));
+  };
+
   useEffect(() => {
-    const fetchTickets = async () => {
-      const { tickets, totalPages, totalCount } = await getTickets({
-        ...filters,
-        sortBy: sort.sortBy,
-        order: sort.order,
-        page: pagination.page,
-        limit: pagination.limit,
-      });
-
-      setTickets(tickets);
-      setPagination((prevState) => ({
-        ...prevState,
-        totalPages,
-        totalCount,
-      }));
-    };
-
     fetchTickets();
   }, [filters, sort, pagination.page, pagination.limit]);
 
@@ -52,6 +52,12 @@ const Home = () => {
 
   const handlePageChange = (event) => {
     setPagination({ ...pagination, page: parseInt(event.target.value) });
+  };
+
+  const handleResolveTicket = async (ticketId) => {
+    await resolveTicket(ticketId);
+    // Refresh tickets after resolving
+    fetchTickets();
   };
 
   return (
@@ -118,25 +124,181 @@ const Home = () => {
       <table className="table mt-4">
         <thead>
           <tr>
-            <th>Topic</th>
-            <th>Description</th>
-            <th>Date Created</th>
-            <th>Severity</th>
-            <th>Type</th>
-            <th>Assigned To</th>
-            <th>Status</th>
+            <th>
+              Topic
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "topic",
+                    order:
+                      sort.sortBy === "topic" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "topic" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
+            <th>
+              Description
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "description",
+                    order:
+                      sort.sortBy === "description" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "description" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
+            <th>
+              Date Created
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "dateCreated",
+                    order:
+                      sort.sortBy === "dateCreated" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "dateCreated" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
+            <th>
+              Severity
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "severity",
+                    order:
+                      sort.sortBy === "severity" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "severity" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
+            <th>
+              Type
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "type",
+                    order:
+                      sort.sortBy === "type" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "type" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
+            <th>
+              Assigned To
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "assignedTo",
+                    order:
+                      sort.sortBy === "assignedTo" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "assignedTo" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
+            <th>
+              Status
+              <button
+                className="btn btn-link"
+                onClick={() =>
+                  setSort({
+                    sortBy: "status",
+                    order:
+                      sort.sortBy === "status" && sort.order === "asc"
+                        ? "desc"
+                        : "asc",
+                  })
+                }
+              >
+                {sort.sortBy === "status" && sort.order === "asc" ? (
+                  <i className="bi bi-caret-up-fill"></i>
+                ) : (
+                  <i className="bi bi-caret-down-fill"></i>
+                )}
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
-          {tickets.map((ticket) => (
-            <tr key={ticket._id}>
+          {tickets.map((ticket, index) => (
+            <tr
+              key={ticket._id}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#f8f9fa" : "#e9ecef",
+              }}
+            >
               <td>{ticket.topic}</td>
               <td>{ticket.description}</td>
               <td>{new Date(ticket.dateCreated).toLocaleString()}</td>
               <td>{ticket.severity}</td>
               <td>{ticket.type}</td>
               <td>{ticket.assignedTo}</td>
-              <td>{ticket.status}</td>
+              <td>
+                {ticket.status !== "Resolved" ? (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleResolveTicket(ticket._id)}
+                  >
+                    Resolve
+                  </button>
+                ) : (
+                  <span className="badge bg-success">Resolved</span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

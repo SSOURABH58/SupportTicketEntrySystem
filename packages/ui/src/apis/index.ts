@@ -34,4 +34,12 @@ export const getTickets = async (filters) => {
   }
 };
 
+export const resolveTicket = async (ticketId) => {
+  try {
+    await api.put(`/api/support-tickets/${ticketId}/resolve`);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export default api;
